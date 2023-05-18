@@ -32,12 +32,12 @@ func (r *Bot) Start() {
 		if update.Message == nil {
 			continue
 		}
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 
 		switch update.Message.Text {
 		case "/start":
 			findOrCreateChatByID(r.db, update.Message.Chat.ID)
 
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 			msg.Text = "Привет, напишите название продукта который вы хотите искать:"
 			bot.Send(msg)
 		// case "yes":
@@ -48,20 +48,19 @@ func (r *Bot) Start() {
 		// 	} else {
 		// 		msg.Text = "Do you want to search for a product?"
 		// 	}
-		default:
-			{
-				addItemSearchInTable(r.db, update.Message.Text, update.Message.Chat.ID)
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
-				msg.Text = "Хотите получать уведомления о новых товарах ? /n Напишите Да для подписки или Нет для продолжения без уведомлений"
-				bot.Send(msg)
-			}
 		case "Да":
 			{
-				changeSubscribe(r.db)
+				changeSubscribe(r.db, update.Message.Chat.ID)
 			}
 		case "Нет":
 			{
 
+			}
+		default:
+			{
+				addItemSearchInTable(r.db, update.Message.Text, update.Message.Chat.ID)
+				msg.Text = "Хотите получать уведомления о новых товарах ? \n Напишите Да для подписки или Нет для продолжения без уведомлений"
+				bot.Send(msg)
 			}
 			// 	userProductMap[update.Message.Chat.ID] = append(userProductMap[update.Message.Chat.ID], update.Message.Text)
 			// 	msg.Text = "Do you want to track when new " + update.Message.Text + " products appear?"
@@ -93,6 +92,8 @@ func addItemSearchInTable(db *sql.DB, message string, chatID int64) {
 	db.Exec("INSERT INTO searches (name, track, chat_id) VALUES ($1, $2, $3) ", message, false, chatID)
 }
 
-func changeSubscribe(db *sql.DB) {
+func changeSubscribe(db *sql.DB, chatID int64) {
+	// подумай как сделать обновление только у того пользователя у которого chat_id
+	// используй механизм join
 	db.Exec("UPDATE searches set track = $1", true)
 }
