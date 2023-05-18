@@ -49,6 +49,20 @@ func (r *Bot) Start() {
 		// 		msg.Text = "Do you want to search for a product?"
 		// 	}
 		default:
+			{
+				addItemSearchInTable(r.db, update.Message.Text, update.Message.Chat.ID)
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+				msg.Text = "Хотите получать уведомления о новых товарах ? /n Напишите Да для подписки или Нет для продолжения без уведомлений"
+				bot.Send(msg)
+			}
+		case "Да":
+			{
+				changeSubscribe(r.db)
+			}
+		case "Нет":
+			{
+
+			}
 			// 	userProductMap[update.Message.Chat.ID] = append(userProductMap[update.Message.Chat.ID], update.Message.Text)
 			// 	msg.Text = "Do you want to track when new " + update.Message.Text + " products appear?"
 		}
@@ -73,4 +87,12 @@ func findOrCreateChatByID(db *sql.DB, chatID int64) (*Chat, error) {
 	}
 
 	return chat, nil
+}
+
+func addItemSearchInTable(db *sql.DB, message string, chatID int64) {
+	db.Exec("INSERT INTO searches (name, track, chat_id) VALUES ($1, $2, $3) ", message, false, chatID)
+}
+
+func changeSubscribe(db *sql.DB) {
+	db.Exec("UPDATE searches set track = $1", true)
 }
