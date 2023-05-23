@@ -21,7 +21,9 @@ func main() {
 	}
 	defer db.Close()
 
-	bot := bot.NewBot(db)
+	store := bot.New(db)
+	events := bot.NewEvents(store)
+	bot := bot.NewBot(events)
 
 	bot.Start()
 }
