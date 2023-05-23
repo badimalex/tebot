@@ -17,6 +17,17 @@ func (m *Events) HandleMessage(messageText string, chatID int64) string {
 		// Вы будете подписаны на следующие товары
 		// 1. ываыва
 		// 2.
+		names, err := m.chatStore.SelectSubscribes(chatID)
+		if err != nil {
+			return err.Error()
+		}
+		if len(names) > 0 {
+			res := "Вы подписаны на следующие товары:\n"
+			for _, item := range names {
+				res += item + "\n"
+			}
+			return res
+		}
 		return "До новых встреч!"
 	case "Нет":
 		return "Вы не подписались на уведомления. \nВведите название товара для поиска либо напишите Стоп чтобы выйти"

@@ -50,12 +50,26 @@ func (c *Storage) Subscribe(chatID int64) error {
 	return err
 }
 
-func (s *Storage) SelectSubscribes(chatID int64) (string, error) {
-	searches := &Searches{}
-	err := s.db.QueryRow("SELECT name FROM searches WHERE track = $1 AND chat_id = $2", true, chatID).Scan(&searches.Name)
+func (s *Storage) SelectSubscribes(chatID int64) ([]string, error) {
+	var names []string
+	rows, err := s.db.Query("SELECT name FROM searches WHERE track = $1 AND chat_id = $2", true, chatID)
 	if err != nil {
-		return "", err
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var name string
+		err := rows.Scan(&name)
+		if err != nil {
+			return nil, err
+		}
+		names = append(names, name)
 	}
 
-	return searches.Name, nil
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return names, nil
 }
