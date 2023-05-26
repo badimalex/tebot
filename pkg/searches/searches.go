@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"net/http"
-	//"os"
+
 	"sort"
 	"strconv"
 	"strings"
@@ -14,13 +14,26 @@ import (
 
 type Goods struct {
 	Name  string
-	Price float64
 	Image string
+	Price float64
 }
 
-func SearchOnEbay(search string) []Goods {
+func SearchOnEbay(search string, prices ...int) []Goods {
 
-	res, errorEbay := http.Get("https://www.ebay.com/sch/i.html?_from=R40&_trksid=p2380057.m570.l1313&_nkw=" + search + "&_sacat=0")
+	search = strings.Replace(search, " ", "+", -1)
+
+	url := "https://www.ebay.com/sch/i.html?_from=R40&_trksid=p2380057.m570.l1313&_nkw=" + search + "&_sacat=0"
+
+	switch len(prices) {
+	case 2:
+		url += "&_udhi=" + strconv.Itoa(prices[0])
+		url += "&_udlo=" + strconv.Itoa(prices[1])
+	case 1:
+		url += "&_udhi=" + "0"
+		url += "&_udlo=" + strconv.Itoa(prices[0])
+	}
+
+	res, errorEbay := http.Get(url)
 
 	if errorEbay != nil {
 		fmt.Println("Err", errorEbay)
@@ -30,7 +43,7 @@ func SearchOnEbay(search string) []Goods {
 
 	goodsList := []Goods{}
 
-	doc.Find("div.s-item__wrapper.clearfix").Each(func(index int, s *goquery.Selection) {
+	doc.Find("li.s-item").Each(func(index int, s *goquery.Selection) {
 
 		s.Find("span[role='heading']").Each(func(index int, q *goquery.Selection) {
 			goodsList = append(goodsList, Goods{Name: q.Text()})
@@ -41,7 +54,7 @@ func SearchOnEbay(search string) []Goods {
 
 			ind := strings.Index(str, delimiter)
 			if ind != -1 {
-				trimmedStr := strings.TrimSpace(str[ind+len(delimiter):])
+				trimmedStr := strings.TrimSpace(str[:ind])
 				num, err := strconv.ParseFloat(trimmedStr[1:], 64)
 				if err == nil {
 					goodsList[len(goodsList)-1].Price = num
@@ -67,19 +80,9 @@ func SearchOnEbay(search string) []Goods {
 		})
 
 	})
+	sort.Slice(goodsList, func(i, j int) bool {
+		return goodsList[i].Price < goodsList[j].Price
+	})
 	return goodsList
 
-}
-
-func SortByPrice(priceFrom float64, priceTo float64, goods []Goods) []Goods {
-	var result []Goods
-	for _, item := range goods {
-		if item.Price > priceFrom && item.Price < priceTo {
-			result = append(result, item)
-		}
-	}
-	sort.Slice(result, func(i, j int) bool {
-		return result[i].Price < result[j].Price
-	})
-	return result
 }

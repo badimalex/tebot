@@ -12,7 +12,10 @@ import (
 )
 
 func main() {
-	fmt.Println(searches.SortByPrice(10.00, 60.00, searches.SearchOnEbay("marshal")))
+	qwe := searches.SearchOnEbay("marshal", 44)
+	for _, items := range qwe {
+		fmt.Println(items)
+	}
 
 	cfg, err := config.LoadConfig("config.yaml")
 	if err != nil {
