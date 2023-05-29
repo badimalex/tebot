@@ -24,13 +24,16 @@ func SearchOnEbay(search string, prices ...int) []Goods {
 
 	url := "https://www.ebay.com/sch/i.html?_from=R40&_trksid=p2380057.m570.l1313&_nkw=" + search + "&_sacat=0"
 
-	switch len(prices) {
-	case 2:
-		url += "&_udhi=" + strconv.Itoa(prices[0])
-		url += "&_udlo=" + strconv.Itoa(prices[1])
-	case 1:
-		url += "&_udhi=" + "0"
+	if len(prices) == 1 {
 		url += "&_udlo=" + strconv.Itoa(prices[0])
+	}
+	if len(prices) == 2 && prices[0] != 0 {
+		url += "&_udlo=" + strconv.Itoa(prices[0])
+		url += "&_udhi=" + strconv.Itoa(prices[1])
+
+	} else {
+		url += "&_udlo=" + "0"
+		url += "&_udhi=" + strconv.Itoa(prices[1])
 	}
 
 	res, errorEbay := http.Get(url)
