@@ -31,7 +31,7 @@ func SearchOnEbay(search string, prices ...int) []Goods {
 		url += "&_udlo=" + strconv.Itoa(prices[0])
 		url += "&_udhi=" + strconv.Itoa(prices[1])
 
-	} else {
+	} else if len(prices) == 2 && prices[0] == 0 {
 		url += "&_udlo=" + "0"
 		url += "&_udhi=" + strconv.Itoa(prices[1])
 	}

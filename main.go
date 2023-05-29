@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	qwe := searches.SearchOnEbay("retro", 0, 44)
+	qwe := searches.SearchOnEbay("retro", 55)
 	for _, items := range qwe {
 		fmt.Println(items)
 	}
