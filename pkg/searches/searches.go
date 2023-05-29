@@ -75,7 +75,7 @@ func SearchOnEbay(search string, prices ...int) []Goods {
 			}
 		})
 
-		doc.Find("img").Each(func(index int, i *goquery.Selection) {
+		s.Find("img[alt='" + goodsList[len(goodsList)-1].Name + "']").Each(func(index int, i *goquery.Selection) {
 			src, _ := i.Attr("src")
 
 			goodsList[len(goodsList)-1].Image = src
