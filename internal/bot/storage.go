@@ -57,7 +57,6 @@ func (s *Storage) SelectSubscribes(chatID int64) ([]string, error) {
 		return nil, err
 	}
 	defer rows.Close()
-
 	for rows.Next() {
 		var name string
 		err := rows.Scan(&name)
@@ -66,10 +65,8 @@ func (s *Storage) SelectSubscribes(chatID int64) ([]string, error) {
 		}
 		names = append(names, name)
 	}
-
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
-
 	return names, nil
 }
