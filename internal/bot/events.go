@@ -13,10 +13,6 @@ func (m *Events) HandleMessage(messageText string, chatID int64) string {
 	case "/start":
 		return "Привет, напишите название продукта который вы хотите искать:"
 	case "Стоп":
-		// сделать выборку если есть searches с текущим chatID то дописать к До новых встреч
-		// Вы будете подписаны на следующие товары
-		// 1. ываыва
-		// 2.
 		names, err := m.chatStore.SelectSubscribes(chatID)
 		if err != nil {
 			return err.Error()

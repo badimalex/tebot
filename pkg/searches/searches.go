@@ -18,22 +18,28 @@ type Goods struct {
 	Price float64
 }
 
-func SearchOnEbay(search string, prices ...int) []Goods {
+func SearchOnEbay(search string, params ...int) []Goods {
+
+	var from, to int
+
+	if len(params) > 0 {
+		from = params[0]
+	}
+
+	if len(params) > 1 {
+		to = params[1]
+	}
 
 	search = strings.Replace(search, " ", "+", -1)
 
 	url := "https://www.ebay.com/sch/i.html?_from=R40&_trksid=p2380057.m570.l1313&_nkw=" + search + "&_sacat=0"
 
-	if len(prices) == 1 {
-		url += "&_udlo=" + strconv.Itoa(prices[0])
+	if from > 0 {
+		url += "&_udlo=" + strconv.Itoa(from)
 	}
-	if len(prices) == 2 && prices[0] != 0 {
-		url += "&_udlo=" + strconv.Itoa(prices[0])
-		url += "&_udhi=" + strconv.Itoa(prices[1])
 
-	} else if len(prices) == 2 && prices[0] == 0 {
-		url += "&_udlo=" + "0"
-		url += "&_udhi=" + strconv.Itoa(prices[1])
+	if to > 0 {
+		url += "&_udhi=" + strconv.Itoa(to)
 	}
 
 	res, errorEbay := http.Get(url)
